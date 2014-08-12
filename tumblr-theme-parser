@@ -17,7 +17,7 @@ def main(json_options_file, theme_file):
 
     parser = tumblr_theme.Parser()
     rendered = parser.parse_theme(options, template)
-    print rendered
+    print rendered.encode('utf8')
 
 
 if __name__ == "__main__":
