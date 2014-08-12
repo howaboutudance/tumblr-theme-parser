@@ -67,17 +67,17 @@ class Parser(object):
 
     def _replace_variable(self, options):
         """Replace variables."""
-        def conversionParseAction(s, l, t):
-            var = "".join(t[1:-1])
+        def conversionParseAction(string, location, tokens):
+            var = "".join(tokens[1:-1])
             if var in options:
                 return options[var]
         return conversionParseAction
 
     def _replace_block(self, options):
         """Replace blocks."""
-        def conversionParseAction(s, l, t):
-            block_name = t[1]
-            block_content = t[3]
+        def conversionParseAction(string, location, tokens):
+            block_name = tokens[1]
+            block_content = tokens[3]
             if block_name in options:
                 return self._parse_template(options, block_content)
             else:
@@ -86,9 +86,9 @@ class Parser(object):
 
     def _replace_block_type(self, options):
         """Replace by type of post."""
-        def conversionParseAction(s, l, t):
-            block_name = t[1]
-            block_content = t[3]
+        def conversionParseAction(string, location, tokens):
+            block_name = tokens[1]
+            block_content = tokens[3]
             if block_name.lower() == options['PostType']:
                 return self._parse_template(options, block_content)
             else:
@@ -97,15 +97,15 @@ class Parser(object):
 
     def _replace_block_cond(self, options):
         """Replace a conditional block."""
-        def conversionParseAction(s, l, t):
-            num_tokens = len(t)
+        def conversionParseAction(string, location, tokens):
+            num_tokens = len(tokens)
             if num_tokens == 9:
-                block_name = t[2].lower()
-                block_content = t[4]
+                block_name = tokens[2].lower()
+                block_content = tokens[4]
                 block_bool = False
             if num_tokens == 7:
-                block_name = t[1].lower()
-                block_content = t[3]
+                block_name = tokens[1].lower()
+                block_content = tokens[3]
                 block_bool = True
 
             for key, value in options.items():
@@ -120,9 +120,9 @@ class Parser(object):
 
     def _replace_block_iter(self, options):
         """Replace blocks with content from an iterable."""
-        def conversionParseAction(s, l, t):
-            block_name = t[1]
-            block_content = t[3]
+        def conversionParseAction(string, location, tokens):
+            block_name = tokens[1]
+            block_content = tokens[3]
             if block_name in options:
                 rendered = ""
                 for element in options[block_name]:
