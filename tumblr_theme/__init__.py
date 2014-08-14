@@ -60,6 +60,11 @@ class Parser(object):
         variable = "{" + variable_prefix + variable_name + "}"
         variable.setParseAction(self._replace_variable(options))
 
+        i18n_label_start = "{lang:"
+        i18n_label_end = "}"
+        i18n_label = i18n_label_start + SkipTo(i18n_label_end).leaveWhitespace() + i18n_label_end
+        i18n_label.setParseAction(self._replace_i18n_label(options))
+
         block_type_name = oneOf("Text Photo Panorama Photoset Quote Link Chat Video Audio")
         block_type_start = "{block:" + block_type_name + "}"
         block_type_end = "{/block:" + block_type_name + "}"
@@ -84,7 +89,7 @@ class Parser(object):
         block_iter = block_iter_start + SkipTo(matchingCloseTag(block_iter_start, block_iter_end).leaveWhitespace(), include=True)
         block_iter.setParseAction(self._replace_block_iter(options))
 
-        parser = (block_iter | block_type | block_cond | block_def_cond | variable)
+        parser = (block_iter | block_type | block_cond | block_def_cond | variable | i18n_label)
         return parser.transformString(template)
 
     def _replace_variable(self, options):
@@ -95,6 +100,13 @@ class Parser(object):
                 return options[var]
             else:
                 return ""
+        return conversionParseAction
+
+    def _replace_i18n_label(self, options):
+        """Translate i18n label."""
+        def conversionParseAction(string, location, tokens):
+            label = tokens[1]
+            return options.get('i18n', {}).get(label, label)
         return conversionParseAction
 
     def _replace_block(self, options):
