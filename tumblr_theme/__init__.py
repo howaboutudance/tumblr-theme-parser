@@ -98,8 +98,6 @@ class Parser(object):
             var = "".join(tokens[1:-1])
             if var in options:
                 return options[var]
-            else:
-                return ""
         return conversionParseAction
 
     def _replace_i18n_label(self, options):
