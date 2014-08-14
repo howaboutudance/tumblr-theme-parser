@@ -1,6 +1,6 @@
 import re
 
-from pyparsing import alphanums, Optional, Word, Literal
+from pyparsing import alphanums, Optional, Word
 from pyparsing import SkipTo, makeHTMLTags, oneOf
 from pyparsing import Forward, ParseException
 
@@ -56,7 +56,7 @@ class Parser(object):
     def _parse_template(self, options, template):
         """Parse a template string."""
         variable_name = Word(alphanums + " " + "-" + "_")
-        variable_prefix = Optional(Literal('select:'))
+        variable_prefix = Optional(Word(alphanums) + ":")
         variable = "{" + variable_prefix + variable_name + "}"
         variable.setParseAction(self._replace_variable(options))
 
@@ -89,7 +89,7 @@ class Parser(object):
         block_iter = block_iter_start + SkipTo(matchingCloseTag(block_iter_start, block_iter_end).leaveWhitespace(), include=True)
         block_iter.setParseAction(self._replace_block_iter(options))
 
-        parser = (block_iter | block_type | block_cond | block_def_cond | variable | i18n_label)
+        parser = (block_iter | block_type | block_cond | block_def_cond | i18n_label | variable)
         return parser.transformString(template)
 
     def _replace_variable(self, options):
